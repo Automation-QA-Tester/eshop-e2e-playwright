@@ -2,6 +2,7 @@ import {test, expect} from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
+import products from '../test-data/products.json';
 
 test('Search and Cart', async ({page})=> {
     const homePage = new HomePage(page)
@@ -10,16 +11,17 @@ test('Search and Cart', async ({page})=> {
 
 
     await homePage.goto();
-    await homePage.searchFor('Pliers');
-   
-    await homePage.openProduct('Combination Pliers');
+    await homePage.searchFor(products.existingProduct.searchTerm);
 
-    await expect(productPage.productName).toHaveText('Combination Pliers');
+    await homePage.openProduct(products.existingProduct.productName);
+
+
+    await expect(productPage.productName).toHaveText(products.existingProduct.productName);
     await productPage.addToCart();
 
     await expect(productPage.alert).toBeVisible();
 
     await cartPage.openCart();
 
-    await expect(cartPage.cartProduct).toHaveText('Combination Pliers');
+    await expect(cartPage.cartProduct).toHaveText(products.existingProduct.productName);
 })
