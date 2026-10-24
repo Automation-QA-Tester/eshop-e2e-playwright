@@ -1,0 +1,10 @@
+{
+  "existingProduct": {
+    "searchTerm": "Pliers",
+    "productName": "Combination Pliers"
+  },
+  "missingProduct": {
+    "searchTerm": "asdfghjkl",
+    "expectedMessage": "There are no products found."
+  }
+}
