@@ -1,10 +1,11 @@
 import {test, expect} from '@playwright/test'
+import { HomePage } from '../pages/HomePage';
 
 test('Search and Cart', async ({page})=> {
-    await page.goto('https://practicesoftwaretesting.com/');
-    
-    await page.locator('[data-test="search-query"]').fill('Pliers');
-    await page.getByRole('button',{name:'Search'}).click();
+    const homepage = new HomePage(page)
+
+    await homepage.goto();
+    await homepage.searchFor('Pliers');
    
     await page.locator('[data-test="product-01M5Q3D91YRMP339BE6NN0ZBDN"]').click();
 
