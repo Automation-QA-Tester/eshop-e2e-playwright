@@ -7,12 +7,11 @@ export class ProductPage{
 
     constructor(page: Page) {
         this.productName = page.locator('[data-test="product-name"]');
-        this.addCart = page.getByRole('button', {name: 'Add to cart '});
+        this.addCart = page.getByRole('button', {name: 'Add to cart'});
         this.alert = page.getByRole('alert',{name: 'Product added to shopping cart.'});
     }
 
-    async addCartButton() {
-        await this.addCart.click();
-        await this.alert.waitFor({state: 'visible'})
+    async addToCart() {
+        await this.addCart.click();        
     }
 }

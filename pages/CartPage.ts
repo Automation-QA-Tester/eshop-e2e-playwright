@@ -9,7 +9,7 @@ export class CartPage{
         this.navCart = page.locator('[data-test="nav-cart"]');
     }
 
-    async cartButton(){
+    async openCart(){
         await this.navCart.click();
     }
 }
