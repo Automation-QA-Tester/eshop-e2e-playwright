@@ -5,12 +5,14 @@ export class HomePage {
     readonly searchInput: Locator;
     readonly searchButton: Locator;
     readonly product: Locator;
+    readonly noResultMessage: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.searchInput = page.getByTestId('search-query');
         this.searchButton = page.getByRole('button', { name: 'Search' });
         this.product = page.getByTestId('product-name');
+        this.noResultMessage = page.getByTestId('no-results');
     }
 
     async goto() {
