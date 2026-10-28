@@ -115,6 +115,7 @@ Pri rastúcom počte testov by som pridal:
 
 - **fixtures**: Page Objects poskytované priamo testom (bez opakovaného `new HomePage(page)`) a before/after logika pre testovacie dáta,
 - ďalšie **Page Objects** podľa potreby (prihlásenie, registrácia, kontaktný formulár),
+- **utils**: spoločné pomocné funkcie (napr. prevod zobrazenej ceny na číslo, generovanie testovacích dát) pre overenia, ktoré sa opakujú vo viacerých testoch, napríklad kontrola ceny v košíku,
 - **dátami riadené testy**: zoznam produktov v JSON, z ktorého sa test spustí pre každý produkt,
 - **Prettier a ESLint** pre jednotné formátovanie a kontrolu kódu, spúšťané aj v CI,
 - **API testovanie** na zrýchlenie prípravy dát a overovania produktov.
