@@ -12,6 +12,7 @@ Testy bežia proti [Practice Software Testing](https://practicesoftwaretesting.c
 |---|---|---|
 | `search-and-cart.spec.ts` | Pozitívny scenár | Vyhľadanie produktu, jeho otvorenie, vloženie do košíka a overenie, že sa v košíku nachádza správny produkt |
 | `search-no-results.spec.ts` | Negatívny scenár | Vyhľadanie neexistujúceho produktu a overenie hlášky „There are no products found." a prázdneho zoznamu produktov |
+| `cart-price.spec.ts` | Výpočet ceny | Zmena množstva produktu v košíku a overenie, že cena riadku aj celková cena košíka sa rovnajú jednotkovej cene krát množstvo |
 
 Hľadané výrazy a očakávané hodnoty sa načítavajú zo súboru `test-data/products.json`, takže sa dajú meniť bez zásahu do kódu testov.
 
@@ -25,6 +26,7 @@ Hľadané výrazy a očakávané hodnoty sa načítavajú zo súboru `test-data/
 │   ├── ProductPage.ts
 │   └── CartPage.ts
 ├── test-data/products.json            # testovacie dáta
+├── utils/price.ts                     # pomocné funkcie (prevod ceny na centy)
 ├── tests/                             # testovacie scenáre (čo sa overuje)
 └── playwright.config.ts               # konfigurácia Playwrightu
 ```
@@ -101,6 +103,10 @@ Overenie textu typu „products found" nepomohlo. Pevné pauzy (`waitForTimeout`
 
 Produkty majú čiastočne zhodné názvy (`Claw Hammer`, `Claw Hammer with Shock Reduction Grip`, `Claw Hammer with Fiberglass Handle`). Filter podľa podreťazca preto našiel viac produktov naraz. Metóda `openProduct` používa regulárny výraz so zhodou celého názvu, takže vyberie vždy práve ten jeden produkt.
 
+### 3. Potvrdenie množstva v košíku
+
+Po zmene množstva v košíku sa cena riadku prepočíta hneď pri písaní, ale celková cena košíka sa aktualizuje až po opustení poľa: stránka vtedy pošle serveru požiadavku `PUT` na zmenu množstva a následne načíta košík. Playwrightov `fill()` pole neopustí, takže celková cena zostávala na pôvodnej hodnote. Metóda `setQuantity` preto po zápise stlačí `Tab` (ako používateľ) a čaká na odpoveď servera na požiadavku `PUT`. Overenie cien je potom v teste cez `expect.poll`, ktorý hodnotu číta opakovane, kým nesedí.
+
 ## Rozhodnutia
 
 - **Page Object Model.** Zadanie požaduje rast (nové testy, stránky a funkcie). Pri stovke testov sa zmena názvu elementu opraví na jednom či dvoch miestach v Page Objects, namiesto úprav v každom teste. Šetrí to čas a predchádza chybám.
@@ -108,6 +114,7 @@ Produkty majú čiastočne zhodné názvy (`Claw Hammer`, `Claw Hammer with Shoc
 - **Hľadaný produkt `Hammer`.** Na rozdiel od `Pliers` nie je celý na prvej stránke, takže odhalil problém so synchronizáciou.
 - **Iné nastavenie v CI než lokálne** (`playwright.config.ts`): `retries: 2` dá testu pri páde ďalšie pokusy, aby krátkodobý výkyv siete netvoril falošné chyby. `workers: 1` zvyšuje stabilitu a reprodukovateľnosť. `forbidOnly` zlyhá beh, ak niekto v kóde zabudne `test.only`, ktoré by potichu vynechalo ostatné testy.
 - **Report sa neotvára automaticky** (`open: 'never'`), aby po zlyhaní neblokoval terminál ani CI.
+- **Overenie ceny ako vzťahu, nie ako konkrétnej hodnoty.** Cena produktu sa na demo stránke môže zmeniť, preto test neoveruje absolútnu cenu, ale že cena riadku a celková cena sa rovnajú jednotkovej cene krát množstvo. Ceny sa porovnávajú v centoch ako celé čísla, aby sa predišlo chybám zaokrúhľovania pri desatinných číslach.
 
 ## Možný ďalší rozvoj
 
@@ -115,7 +122,7 @@ Pri rastúcom počte testov by som pridal:
 
 - **fixtures**: Page Objects poskytované priamo testom (bez opakovaného `new HomePage(page)`) a before/after logika pre testovacie dáta,
 - ďalšie **Page Objects** podľa potreby (prihlásenie, registrácia, kontaktný formulár),
-- **utils**: spoločné pomocné funkcie (napr. prevod zobrazenej ceny na číslo, generovanie testovacích dát) pre overenia, ktoré sa opakujú vo viacerých testoch, napríklad kontrola ceny v košíku,
+- rozšírenie **utils** o ďalšie pomocné funkcie (napr. generovanie testovacích dát),
 - **dátami riadené testy**: zoznam produktov v JSON, z ktorého sa test spustí pre každý produkt,
 - **Prettier a ESLint** pre jednotné formátovanie a kontrolu kódu, spúšťané aj v CI,
 - **API testovanie** na zrýchlenie prípravy dát a overovania produktov.
